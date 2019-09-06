@@ -26,12 +26,12 @@ class LearningCase(unittest.TestCase):
         f = lambda a, b: (a, b)
         self.assertRaises(AssertionError, e.parallelize, f, ['a', 'c'])
 
-    def test_2(self):
+    def test_3(self):
         settings = {'a': [1, 2, 3], 'b': ['hu', 'hi', 'ho']}
         e = ExpHelper(name='e0', settings=settings)
         e.do_or_load('data_store', ['a', 'b'], lambda a, b: str(a) + b, {'a': 1, 'b': 'hu'})
 
-    def test_3(self):
+    def test_4(self):
         settings = {'a': [1, 2, 3], 'b': ['hu', 'hi', 'ho']}
         e = ExpHelper(name='e0', settings=settings)
 
