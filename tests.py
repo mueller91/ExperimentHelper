@@ -38,10 +38,11 @@ class LearningCase(unittest.TestCase):
         def f(a, b):
             def func_expensive(a, b):
                 time.sleep(1)
-                str(a) + str(b)
-            e.do_or_load('data_store', ['a', 'b'], func_expensive, {'a': a, 'b': b})
+                return str(a) + str(b)
+            return e.do_or_load('data_store', ['a', 'b'], func_expensive, {'a': a, 'b': b})
 
-        e.parallelize(f, ['a', 'b'])
+        res = e.parallelize(f, ['a', 'b'])
+        self.assertEqual(res, ['1hu', '1hi', '1ho', '2hu', '2hi', '2ho', '3hu', '3hi', '3ho'])
 
 
 def main():

@@ -1,8 +1,6 @@
 import itertools
 import os
-import time
-from typing import Union
-from datetime import datetime
+from tabulate import tabulate
 
 import logging
 import dill
@@ -14,6 +12,7 @@ logging.basicConfig(
     format='%(asctime)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
 )
+
 
 class ExpHelper:
     def __init__(self, name, settings: dict):
@@ -29,7 +28,9 @@ class ExpHelper:
             assert s in self.settings.keys(), f"{s} not in settings (keys: {' '.join(self.settings.keys())})"
         mp = pathos.helpers.mp
         p = mp.Pool(int(cpu_p * os.cpu_count()))
-        return p.starmap(logfun, itertools.product(*[self.settings[i] for i in on_settings_keys]))
+        full_res = p.starmap(logfun, itertools.product(*[self.settings[i] for i in on_settings_keys]))
+        logging.info('Done.\n')
+        return full_res
 
     @staticmethod
     def do_or_load(base_path, list_of_properties, func, args: dict):
@@ -52,3 +53,7 @@ class ExpHelper:
                 os.mkdir(p)
         with open(path_of_file, 'wb') as df:
             dill.dump(res, df)
+
+    @staticmethod
+    def pretty_print(df):
+        print(tabulate(df, headers="keys", tablefmt="psql"))
