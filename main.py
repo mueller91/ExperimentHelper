@@ -1,11 +1,19 @@
 import itertools
 import os
+import time
 from typing import Union
 from datetime import datetime
 
+import logging
 import dill
 import pathos as pathos
 
+logging.basicConfig(
+    # filename='HISTORYlistener.log',
+    level=logging.INFO,
+    format='%(asctime)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+)
 
 class ExpHelper:
     def __init__(self, name, settings: dict):
@@ -13,11 +21,15 @@ class ExpHelper:
         self.settings = settings
 
     def parallelize(self, function, on_settings_keys: list, cpu_p=0.8):
+        def logfun(*args):
+            logging.info(msg="Start run with" + str(args))
+            return function(*args)
+
         for s in on_settings_keys:
             assert s in self.settings.keys(), f"{s} not in settings (keys: {' '.join(self.settings.keys())})"
         mp = pathos.helpers.mp
         p = mp.Pool(int(cpu_p * os.cpu_count()))
-        return p.starmap(function, itertools.product(*[self.settings[i] for i in on_settings_keys]))
+        return p.starmap(logfun, itertools.product(*[self.settings[i] for i in on_settings_keys]))
 
     @staticmethod
     def do_or_load(base_path, list_of_properties, func, args: dict):
@@ -40,5 +52,3 @@ class ExpHelper:
                 os.mkdir(p)
         with open(path_of_file, 'wb') as df:
             dill.dump(res, df)
-
-
